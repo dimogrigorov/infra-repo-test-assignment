@@ -20,26 +20,29 @@ helm show values ingress-nginx/ingress-nginx > values.yaml
 ## Install from the Local Nginx Ingress Chart
 4. helm install my-nginx helm-charts/ingress-nginx/ingress-nginx-*.tgz -f helm-charts/ingress-nginx/values.yaml
 
-# Steps to Install Flux in EKS Using Helm
+# Steps to Install/bootstrap Flux
 
 ## Prerequisites
 ✅ EKS Cluster up and running.
 ✅ kubectl configured to communicate with the cluster.
-✅ Helm installed (helm version should return a valid version).
 ✅ GitHub Personal Access Token (PAT) with repo permissions (for GitOps).
 
-## Add and Update the Flux Helm Repository (Optional)
-helm repo add fluxcd https://charts.fluxcd.io
-helm repo update
-helm fetch fluxcd/flux --version <version>  # Optional: specify version
-tar -xzf flux-*.tgz
 
-## Store value file separately:
-helm show values flux/ > values.yaml
+## Generating and Retrieving an SSH Key for Flux
+ssh-keygen -t ed25519 -C "flux-eks"
+The key will be saved in ~/.ssh/id_ed25519 by default.
+You’ll get two files:
+id_ed25519 (private key)
+id_ed25519.pub (public key)
+5. cat ~/.ssh/id_ed25519.pub Copy the output and add it to your GitHub repository as a deploy key (Settings → Deploy Keys → Add Key).
 
-## Install from the Local Flux Chart
-helm install flux helm-charts/flux/flux-*.tgz -f helm-charts/flux/values.yaml --namespace flux-system --create-namespace   --set git.url=git.url=git@github.com:<your-github-username>/<your-repo>.git --set git.branch=main
+## Flux bootstrap
+6. using SSH: 
+flux bootstrap github \
+  --owner=<github-username> \
+  --repository=<repo-name> \
+  --branch=main \
+  --path=clusters/my-cluster \
+  --private-key-file ~/.ssh/id_ed25519
 
-📌 Replace:
-<your-github-username> → Your GitHub username.
-<your-repo> → The repo where your Kubernetes manifests live.
+
