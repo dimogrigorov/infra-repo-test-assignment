@@ -123,22 +123,22 @@ resource "aws_iam_instance_profile" "eks_worker_profile" {
 }
 
 
-data "aws_caller_identity" "current" {}
+#data "aws_caller_identity" "current" {}
 
-resource "aws_security_group_rule" "eks_ingress_nodes" {
-  type                     = "ingress"
-  from_port                = 1025
-  to_port                  = 65535
-  protocol                 = "tcp"
-  security_group_id        = module.vpc.default_security_group_id
-  source_security_group_id = module.vpc.default_security_group_id
-}
+#resource "aws_security_group_rule" "eks_ingress_nodes" {
+#  type                     = "ingress"
+#  from_port                = 1025
+#  to_port                  = 65535
+#  protocol                 = "tcp"
+#  security_group_id        = module.vpc.default_security_group_id
+#  source_security_group_id = module.vpc.default_security_group_id
+#}
 
-resource "aws_security_group_rule" "eks_egress_all" {
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol         = "-1"
-  security_group_id = module.vpc.default_security_group_id
-  cidr_blocks      = ["0.0.0.0/0"]
-}
+#resource "aws_security_group_rule" "eks_egress_all" {
+#  type              = "egress"
+#  from_port         = 0
+#  to_port           = 0
+#  protocol         = "-1"
+#  security_group_id = module.vpc.default_security_group_id
+#  cidr_blocks      = ["0.0.0.0/0"]
+#}
