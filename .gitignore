@@ -1,0 +1,33 @@
+# Ignore editor/IDE settings
+.vscode/
+.idea/
+*.swp
+
+# Ignore local environment files
+.env
+
+# AWS credentials (if using environment variables)
+.aws/
+# Terraform state files (sensitive information)
+*.tfstate
+*.tfstate.backup
+
+# Crash logs
+crash.log
+
+# Terraform lock files
+.terraform.lock.hcl
+
+# Terraform plan files
+*.tfplan
+
+# Ignore Terraform directories
+.terraform/
+
+# Ignore override files (local modifications)
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+terraform-manifests/kubectl
+terraform-manifests/private-key/terraform-key.pem
