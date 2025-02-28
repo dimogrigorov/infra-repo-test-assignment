@@ -20,20 +20,6 @@ helm show values ingress-nginx/ingress-nginx > values.yaml
 ## Install from the Local Nginx Ingress Chart
 4. helm install my-nginx helm-charts/ingress-nginx/ingress-nginx-*.tgz -f helm-charts/ingress-nginx/values.yaml
 
-## Install External Secret manager Chart
-## Add External secrets controller Helm Repository (Optional)
-helm repo add external-secrets https://charts.external-secrets.io
-helm repo update
-helm fetch external-secrets/external-secrets
-tar -xzf external-secrets-*.tgz
-## Store value file separately:
-helm show values external-secrets/external-secrets > values.yaml
-
-## Install from the Local External Secret Chart
-5. helm install external-secrets helm-charts/external-secrets/external-secrets-*.tgz -f helm-charts/external-secrets/values.yaml --namespace kube-system 
-
-
-
 # Steps to Install/bootstrap Flux
 
 ## Prerequisites
@@ -48,10 +34,10 @@ The key will be saved in ~/.ssh/id_ed25519 by default.
 You’ll get two files:
 id_ed25519 (private key)
 id_ed25519.pub (public key)
-6. cat ~/.ssh/id_ed25519.pub Copy the output and add it to your GitHub repository as a deploy key (Settings → Deploy Keys → Add Key).
+5. cat ~/.ssh/id_ed25519.pub Copy the output and add it to your GitHub repository as a deploy key (Settings → Deploy Keys → Add Key).
 
 ## Flux bootstrap
-7. using SSH: 
+6. using SSH: 
 flux bootstrap github \
   --owner=<github-username> \
   --repository=<repo-name> \
