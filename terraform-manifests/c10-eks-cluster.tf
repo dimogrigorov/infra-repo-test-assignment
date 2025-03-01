@@ -122,23 +122,72 @@ resource "aws_iam_instance_profile" "eks_worker_profile" {
   role = aws_iam_role.eks_worker_role.name
 }
 
+# Create IAM Policy for AWS Load Balancer Controller
+resource "aws_iam_policy" "aws_lb_controller_policy" {
+  name        = "AWSLoadBalancerControllerPolicy"
+  description = "IAM policy for AWS Load Balancer Controller"
+  policy      = <<POLICY
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:CreateServiceLinkedRole",
+                "ec2:DescribeAccountAttributes",
+                "ec2:DescribeAddresses",
+                "ec2:DescribeInternetGateways",
+                "ec2:DescribeVpcs",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeSecurityGroups",
+                "ec2:DescribeInstances",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DescribeTags",
+                "ec2:GetCoipPoolUsage",
+                "ec2:DescribeCoipPools",
+                "elasticloadbalancing:DescribeLoadBalancers",
+                "elasticloadbalancing:DescribeListeners",
+                "elasticloadbalancing:DescribeSSLPolicies",
+                "elasticloadbalancing:DescribeRules",
+                "elasticloadbalancing:DescribeTargetGroups",
+                "elasticloadbalancing:DescribeTargetHealth",
+                "elasticloadbalancing:DescribeTags"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "cognito-idp:DescribeUserPoolClient",
+                "acm:ListCertificates",
+                "acm:DescribeCertificate",
+                "iam:ListServerCertificates",
+                "iam:GetServerCertificate",
+                "waf-regional:GetWebACL",
+                "waf-regional:GetWebACLForResource",
+                "waf-regional:AssociateWebACL",
+                "waf-regional:DisassociateWebACL",
+                "wafv2:GetWebACL",
+                "wafv2:GetWebACLForResource",
+                "wafv2:AssociateWebACL",
+                "wafv2:DisassociateWebACL",
+                "shield:GetSubscriptionState",
+                "shield:DescribeProtection",
+                "shield:CreateProtection",
+                "shield:DeleteProtection"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:AuthorizeSecurityGroupIngress",
+                "ec2:RevokeSecurityGroupIngress"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+POLICY
+}
 
-#data "aws_caller_identity" "current" {}
-
-#resource "aws_security_group_rule" "eks_ingress_nodes" {
-#  type                     = "ingress"
-#  from_port                = 1025
-#  to_port                  = 65535
-#  protocol                 = "tcp"
-#  security_group_id        = module.vpc.default_security_group_id
-#  source_security_group_id = module.vpc.default_security_group_id
-#}
-
-#resource "aws_security_group_rule" "eks_egress_all" {
-#  type              = "egress"
-#  from_port         = 0
-#  to_port           = 0
-#  protocol         = "-1"
-#  security_group_id = module.vpc.default_security_group_id
-#  cidr_blocks      = ["0.0.0.0/0"]
-#}

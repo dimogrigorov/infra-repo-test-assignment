@@ -9,24 +9,8 @@
 ## How to apply your terraform code and create managed EKS cluster on AWS
 3. terraform apply  -var-file dev.tfvars  -auto-approve 
 
-## Add and Update the Nginx Ingress controller Helm Repository (Optional)
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-helm repo update
-helm fetch ingress-nginx/ingress-nginx --version <version>  # Optional: specify version
-tar -xzf ingress-nginx-*.tgz
-## Store value file separately:
-helm show values ingress-nginx/ingress-nginx > values.yaml
-
-## Install from the Local Nginx Ingress Chart
-4. helm install my-nginx helm-charts/ingress-nginx/ingress-nginx-*.tgz -f helm-charts/ingress-nginx/values.yaml
-
-# Steps to Install/bootstrap Flux
-
-## Prerequisites
-✅ EKS Cluster up and running.
-✅ kubectl configured to communicate with the cluster.
-✅ GitHub Personal Access Token (PAT) with repo permissions (for GitOps).
-
+## Installing nginx-ingress controller(OPTIONAL and not done in our case) 
+4. Follow the instructions in helm-charts/ingress-nginx/ and helm-charts/ingress-nginx/ingress-controller-prerequisites/
 
 ## Generating and Retrieving an SSH Key for Flux
 ssh-keygen -t ed25519 -C "flux-eks"
