@@ -76,7 +76,9 @@ flux get helmrelease -n staging
 If Flux does not automatically detect changes, manually trigger reconciliation:
 ```sh
 flux reconcile source git flux-system -n flux-system
-flux reconcile helmrelease app1 -n staging
+flux reconcile kustomization flux-system -n flux-system
+flux reconcile kustomization staging -n flux-system
+flux reconcile kustomization production -n flux-system
 ```
 
 ### 4.3 Check Logs for Issues
