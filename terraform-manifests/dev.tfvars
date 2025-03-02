@@ -13,4 +13,5 @@ vpc_single_nat_gateway = true
 # EC2 Instance Variables
 instance_type = "t3.micro"
 instance_keypair = "terraform-key"
+aws_account_id = "479701439711"
 
