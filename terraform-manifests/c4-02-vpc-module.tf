@@ -23,9 +23,14 @@ module "vpc" {
   vpc_tags = local.common_tags
 
   # Additional Tags to Subnets
-  public_subnet_tags = {
-    Type = "Public Subnets"
-  }
+  public_subnet_tags = merge(
+    {
+      Type = "Public Subnets"
+    },
+    {
+      "kubernetes.io/cluster/${var.cluster_name}" = "shared"
+    }
+  )
   private_subnet_tags = {
     Type = "Private Subnets"
   }   

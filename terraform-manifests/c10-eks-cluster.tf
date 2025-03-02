@@ -2,7 +2,7 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "18.14.0"
 
-  cluster_name                    = "my-cluster"
+  cluster_name                    = "${var.cluster_name}"
   cluster_version                 = "1.31"
 
   cluster_endpoint_private_access = true
@@ -28,9 +28,9 @@ module "eks" {
     instance_types = ["t3.medium"]
 
     attach_cluster_primary_security_group = true
-#    vpc_security_group_ids                = [aws_security_group.additional.id]
     key_name       = "terraform-key"
-    vpc_security_group_ids = [module.vpc.default_security_group_id]
+   
+    vpc_security_group_ids = [module.vpc.default_security_group_id, aws_security_group.eks_worker_sg.id]
   }
 
   eks_managed_node_groups = {
@@ -56,6 +56,47 @@ module "eks" {
   }
 
   tags = local.common_tags
+}
+
+# Create security group for EKS Worker nodes
+resource "aws_security_group" "eks_worker_sg" {
+  name        = "eks-worker-sg"
+  description = "EKS Worker nodes security group"
+  vpc_id      = module.vpc.vpc_id
+
+  # Ingress Rules
+  ingress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # Allow traffic from anywhere
+  }
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # Allow SSH access from anywhere (adjust if needed)
+  }
+
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # Allow HTTP traffic on port 8080 from anywhere
+  }
+
+  # Egress Rules
+  egress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # Allow all outbound traffic
+  }
+
+  tags = {
+    Name = "eks-worker-sg"
+  }
 }
 
 resource "kubernetes_config_map" "aws_auth" {
