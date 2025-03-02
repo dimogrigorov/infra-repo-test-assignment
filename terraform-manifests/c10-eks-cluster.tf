@@ -29,6 +29,7 @@ module "eks" {
 
     attach_cluster_primary_security_group = true
 #    vpc_security_group_ids                = [aws_security_group.additional.id]
+    key_name       = "terraform-key"
     vpc_security_group_ids = [module.vpc.default_security_group_id]
   }
 
