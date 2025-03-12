@@ -16,7 +16,7 @@ output "oidc_provider_url" {
 resource "aws_iam_policy" "aws_lb_controller_policy" {
   name        = "AWSLoadBalancerControllerIAMPolicy"
   description = "IAM policy for AWS Load Balancer Controller"
-  policy      = file("${path.module}/iam-policy.json") # Download from AWS repo
+  policy      = file("${path.module}/policies/iam-policy.json") # Download from AWS repo
 }
 
 resource "aws_iam_role" "aws_lb_controller_role" {
@@ -76,4 +76,60 @@ resource "helm_release" "aws_lb_controller" {
     name  = "serviceAccount.name"
     value = "aws-load-balancer-controller"
   }
+}
+
+
+
+resource "aws_iam_role" "load_balancer_role" {
+  name               = "CreateLoadBalancerRole"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect    = "Allow"
+        Principal = {
+          Service = "ecs.amazonaws.com"  # or other services that need this role
+        }
+        Action   = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "load_balancer_policy" {
+  name        = "LoadBalancerPolicy"
+  description = "IAM policy for EC2 and ELB permissions"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = [
+          "ec2:DescribeInstances",
+          "ec2:DescribeNetworkInterfaces",
+          "ec2:DescribeVpcs",
+          "ec2:DescribeSubnets",
+          "ec2:DescribeSecurityGroups",
+          "ec2:AuthorizeSecurityGroupIngress",
+          "ec2:RevokeSecurityGroupIngress",
+          "elasticloadbalancing:CreateLoadBalancer",
+          "elasticloadbalancing:DescribeLoadBalancers",
+          "elasticloadbalancing:ModifyLoadBalancerAttributes",
+          "elasticloadbalancing:CreateTargetGroup",
+          "elasticloadbalancing:DescribeTargetGroups",
+          "elasticloadbalancing:RegisterTargets",
+          "elasticloadbalancing:DescribeListeners",
+          "elasticloadbalancing:CreateListener",
+          "elasticloadbalancing:DescribeLoadBalancerAttributes"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "load_balancer_role_policy_attachment" {
+  role       = aws_iam_role.load_balancer_role.name
+  policy_arn = aws_iam_policy.load_balancer_policy.arn
 }

@@ -48,7 +48,7 @@ flux bootstrap github \
   --owner=<github-username> \
   --repository=<repo-name> \
   --branch=main \
-  --path=clusters/my-cluster \
+  --path=my-cluster \
   --private-key-file ~/.ssh/id_ed25519
 ```
 
