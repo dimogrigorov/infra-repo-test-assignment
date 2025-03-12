@@ -29,7 +29,7 @@ module "vpc" {
       Type = "Public Subnets"
     },
     {
-      "kubernetes.io/cluster/${var.cluster_name}" = "shared"
+      "kubernetes.io/role/elb" = "1"
     }
   )
   private_subnet_tags = {

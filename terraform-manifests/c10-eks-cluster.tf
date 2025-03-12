@@ -179,9 +179,3 @@ resource "aws_iam_role_policy_attachment" "ec2_container_registry_readonly" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
   role       = aws_iam_role.eks_worker_role.name
 }
-
-# Allow the worker nodes to join the cluster
-resource "aws_iam_instance_profile" "eks_worker_profile" {
-  name = "eks-worker-profile"
-  role = aws_iam_role.eks_worker_role.name
-}
