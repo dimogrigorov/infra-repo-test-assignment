@@ -30,4 +30,4 @@ override.tf.json
 *_override.tf
 *_override.tf.json
 terraform-manifests/kubectl
-terraform-manifests/private-key/terraform-key.pem
+terraform-manifests/private-key/terraform-key.pem*

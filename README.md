@@ -20,18 +20,9 @@ To provision the managed EKS cluster, execute:
 terraform apply -var-file=dev.tfvars -auto-approve
 ```
 
----
+## 2. Setting Up FluxCD for GitOps
 
-## 2. Deploying Ingress Controller (Optional - Not Used in Our Case)
-If needed, follow the instructions in the respective Helm charts directories:
-- [helm-charts/ingress-nginx/](helm-charts/ingress-nginx/)
-- [helm-charts/ingress-nginx/ingress-controller-prerequisites/](helm-charts/ingress-nginx/ingress-controller-prerequisites/)
-
----
-
-## 3. Setting Up FluxCD for GitOps
-
-### 3.1 Generate and Retrieve an SSH Key for Flux
+### 2.1 Generate and Retrieve an SSH Key for Flux
 To generate an SSH key for Flux to authenticate with GitHub, run:
 ```sh
 ssh-keygen -t ed25519 -C "flux-eks"
@@ -42,7 +33,7 @@ You will get two files:
 - `id_ed25519` (private key)
 - `id_ed25519.pub` (public key)
 
-### 3.2 Add SSH Key to GitHub as a Deploy Key
+### 2.2 Add SSH Key to GitHub as a Deploy Key
 Retrieve the public key:
 ```sh
 cat ~/.ssh/id_ed25519.pub
@@ -50,7 +41,7 @@ cat ~/.ssh/id_ed25519.pub
 Copy the output and add it to your GitHub repository under:
 **GitHub Settings → Deploy Keys → Add Key** (Ensure "Allow write access" is enabled).
 
-### 3.3 Bootstrap Flux with GitHub
+### 2.3 Bootstrap Flux with GitHub
 Use the following command to bootstrap Flux:
 ```sh
 flux bootstrap github \
@@ -63,16 +54,16 @@ flux bootstrap github \
 
 ---
 
-## 4. Verifying FluxCD Deployment
+## 3. Verifying FluxCD Deployment
 
-### 4.1 Check If Flux Is Detecting Changes
+### 3.1 Check If Flux Is Detecting Changes
 Run the following commands to check the status of Flux sources and Helm releases:
 ```sh
 flux get sources git -n flux-system
 flux get helmrelease -n staging
 ```
 
-### 4.2 Force a Reconciliation (If Needed)
+### 3.2 Force a Reconciliation (If Needed)
 If Flux does not automatically detect changes, manually trigger reconciliation:
 ```sh
 flux reconcile source git flux-system -n flux-system
@@ -81,11 +72,16 @@ flux reconcile kustomization staging -n flux-system
 flux reconcile kustomization production -n flux-system
 ```
 
-### 4.3 Check Logs for Issues
+### 3.3 Check Logs for Issues
 If errors occur, inspect the logs for debugging:
 ```sh
 kubectl logs -n flux-system -l app.kubernetes.io/name=source-controller
 kubectl logs -n flux-system -l app.kubernetes.io/name=helm-controller
 ```
 
-
+## 4. Install argocd
+Run the following::
+```sh
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+```

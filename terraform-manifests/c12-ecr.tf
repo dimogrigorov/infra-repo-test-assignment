@@ -1,48 +1,9 @@
-resource "aws_iam_policy" "ecr_pull_policy" {
-  name        = "ECRPullPolicy"
-  description = "Allows pulling images from AWS ECR"
-  
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect   = "Allow"
-        Action   = [
-          "ecr:GetAuthorizationToken"
-        ]
-        Resource = "*"
-      },
-      {
-        Effect   = "Allow"
-        Action   = [
-          "ecr:BatchCheckLayerAvailability",
-          "ecr:GetDownloadUrlForLayer",
-          "ecr:BatchGetImage",
-          "ec2:DescribeInstances",
-          "ec2:DescribeNetworkInterfaces",
-          "ec2:DescribeVpcs",
-          "ec2:DescribeSubnets",
-          "ec2:DescribeSecurityGroups",
-          "ec2:AuthorizeSecurityGroupIngress",
-          "ec2:RevokeSecurityGroupIngress",
-          "elasticloadbalancing:CreateLoadBalancer",
-          "elasticloadbalancing:DescribeLoadBalancers",
-          "elasticloadbalancing:ModifyLoadBalancerAttributes",
-          "elasticloadbalancing:CreateTargetGroup",
-          "elasticloadbalancing:DescribeTargetGroups",
-          "elasticloadbalancing:RegisterTargets",
-          "elasticloadbalancing:DescribeListeners",
-          "elasticloadbalancing:CreateListener",
-          "elasticloadbalancing:DescribeLoadBalancerAttributes"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
-}
-
 resource "aws_ecr_repository" "my_repo" {
-  name                 = "testassignment/my-spring-boot-repo"
+  #for_each = toset(var.ecr_repositories)
+  name = "testname"
+
+  count = var.create_ecr_repo ? 1 : 0  
+  #name                 = "testassignment/${each.value}"
   image_tag_mutability = "MUTABLE"
 
   encryption_configuration {
@@ -56,40 +17,20 @@ resource "aws_ecr_repository" "my_repo" {
   tags = {
     Environment = "Production"
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
-data "aws_eks_cluster" "eks" {
-  name = "${var.cluster_name}"
+variable "create_ecr_repo" {
+  description = "Boolean flag to determine whether to create the ECR repository"
+  type        = bool
+  default     = false  # Set to false if you want to skip creation
 }
 
-data "aws_iam_openid_connect_provider" "eks_oidc" {
-  url = data.aws_eks_cluster.eks.identity[0].oidc[0].issuer
+variable "ecr_repositories" {
+  description = "List of ECR repository names"
+  type        = list(string)
+  default     = []
 }
-
-resource "aws_iam_role" "ecr_access_role" {
-  name = "ECRAccessRole"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          Federated = "arn:aws:iam::${var.aws_account_id}:oidc-provider/${var.eks_oidc_provider}"
-        }
-        Action = "sts:AssumeRoleWithWebIdentity"
-        Condition = {
-          StringEquals = {
-            "${replace(data.aws_eks_cluster.eks.identity[0].oidc[0].issuer, "https://", "")}:sub" = "system:serviceaccount:default:ecr-sa"
-          }
-        }
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "ecr_attach" {
-  policy_arn = aws_iam_policy.ecr_pull_policy.arn
-  role       = aws_iam_role.ecr_access_role.name
-}
-
-

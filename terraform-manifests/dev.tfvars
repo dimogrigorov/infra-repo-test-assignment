@@ -14,4 +14,13 @@ vpc_single_nat_gateway = true
 instance_type = "t3.micro"
 instance_keypair = "terraform-key"
 aws_account_id = "479701439711"
+#eks_oidc_provider = "oidc.eks.us-east-1.amazonaws.com/id/3019CF13FBBFF050463353654F3FD056"
 
+locks_table = "terraform-locks"
+backend_bucket_name = "my-terraform-state-bucket-dimogrig"
+remote_state_key = "dev/terraform.tfstate"
+
+instance_types = ["t3.medium"]
+capacity_type = "SPOT"
+
+ecr_repositories = ["my-spring-boot-repo"]

@@ -20,11 +20,17 @@ terraform {
       version = ">= 1.7.0"
     }               
   }
-  # Adding Backend as S3 for Remote State Storage
-  backend "s3" {}      
+  backend "s3" {
+    bucket         = "my-terraform-state-bucket-dimogrig"  # Use the actual bucket name, NOT a module reference
+    key            = "prod/terraform.tfstate"
+    region         = "us-east-1"
+    encrypt        = true
+    dynamodb_table = "terraform-locks"
+  }  
 }
 provider "aws" {
   region  = var.aws_region
+  alias  = "s3_region"
   #profile = "default"
 }
 
