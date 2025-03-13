@@ -8,6 +8,10 @@ module "eks" {
   cluster_endpoint_private_access = true
   cluster_endpoint_public_access  = true
 
+  cluster_security_group_id = aws_security_group.eks_worker_sg.id
+  node_security_group_id    = aws_security_group.eks_worker_sg.id
+  create_node_security_group = false
+
   cluster_addons = {
     coredns = {
       resolve_conflicts_on_create = "OVERWRITE"
@@ -27,10 +31,10 @@ module "eks" {
     ami_type       = "AL2_x86_64"
     instance_types = var.instance_types
 
-    attach_cluster_primary_security_group = true
+    attach_cluster_primary_security_group = false
     key_name       = "terraform-key"
    
-    vpc_security_group_ids = [module.vpc.default_security_group_id, aws_security_group.eks_worker_sg.id]
+    vpc_security_group_ids = [aws_security_group.eks_worker_sg.id]
   }
 
   eks_managed_node_groups = {
@@ -73,7 +77,6 @@ module "eks" {
         ExtraTag = "example"
       }
     }
-    
   }
 
   tags = local.common_tags
@@ -117,6 +120,7 @@ resource "aws_security_group" "eks_worker_sg" {
 
   tags = {
     Name = "eks-worker-sg"
+    "kubernetes.io/cluster/my-cluster" = "owned"  # Add the tag here
   }
 }
 
